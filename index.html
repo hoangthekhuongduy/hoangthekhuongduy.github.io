@@ -457,23 +457,29 @@ function copy(text) {
 <script src="assets/js/common.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
 <script src="assets/demo/plugins-demo.js"></script>
-<!-- NÚT NHẠC RGB GAMING -->
-<audio id="music" loop>
-<source src="https://store-na-phx-5.gofile.io/download/web/456409fd-1de8-4b6e-a388-3559b55e0c9d/sao%20th%E1%BA%A5y%20%C4%91%C3%B4i%20mi%20em%20bu%E1%BB%93n....mp3" type="audio/mpeg">
-</audio>
+<!-- NHẠC SOUNDLOUD + NÚT RGB -->
+<iframe
+id="scMusic"
+width="0"
+height="0"
+scrolling="no"
+frameborder="no"
+allow="autoplay"
+src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
+</iframe>
 
-<button id="rgbMusicBtn">🎵 MUSIC ON</button>
+<button id="rgbMusicBtn">🎵 BẬT NHẠC</button>
 
 <style>
 #rgbMusicBtn{
 position:fixed;
 right:20px;
 bottom:20px;
-width:180px;
-height:58px;
+width:170px;
+height:55px;
 border:none;
 border-radius:40px;
-font-size:17px;
+font-size:16px;
 font-weight:bold;
 color:#fff;
 cursor:pointer;
@@ -490,7 +496,7 @@ transform:scale(1.05);
 }
 
 #rgbMusicBtn.off{
-background:linear-gradient(90deg,#444,#222,#444);
+background:#333;
 box-shadow:none;
 color:#aaa;
 animation:none;
@@ -504,23 +510,21 @@ animation:none;
 </style>
 
 <script>
-const music=document.getElementById("music");
-const btn=document.getElementById("rgbMusicBtn");
+const btn = document.getElementById("rgbMusicBtn");
+const frame = document.getElementById("scMusic");
+let playing = false;
 
-window.addEventListener("load",function(){
-music.volume=0.7;
-music.play().catch(()=>{});
-});
-
-btn.onclick=function(){
-if(music.paused){
-music.play();
-btn.innerHTML="🎵 MUSIC ON";
+btn.onclick = function(){
+if(!playing){
+frame.src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
+btn.innerHTML="🔊 TẮT NHẠC";
 btn.classList.remove("off");
+playing=true;
 }else{
-music.pause();
-btn.innerHTML="🔇 MUSIC OFF";
+frame.src="";
+btn.innerHTML="🎵 BẬT NHẠC";
 btn.classList.add("off");
+playing=false;
 }
 }
 </script>
