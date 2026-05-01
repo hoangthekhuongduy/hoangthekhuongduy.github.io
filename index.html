@@ -457,7 +457,7 @@ function copy(text) {
 <script src="assets/js/common.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
 <script src="assets/demo/plugins-demo.js"></script>
-<!-- NHẠC SOUNDLOUD + NÚT RGB -->
+<!-- SOUNDCLOUD AUTO PLAY + NÚT RGB -->
 <iframe
 id="scMusic"
 width="0"
@@ -465,10 +465,10 @@ height="0"
 scrolling="no"
 frameborder="no"
 allow="autoplay"
-src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
+src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
 </iframe>
 
-<button id="rgbMusicBtn">🎵 BẬT NHẠC</button>
+<button id="rgbMusicBtn">🔊 TẮT NHẠC</button>
 
 <style>
 #rgbMusicBtn{
@@ -512,20 +512,34 @@ animation:none;
 <script>
 const btn = document.getElementById("rgbMusicBtn");
 const frame = document.getElementById("scMusic");
-let playing = false;
+let playing = true;
 
-btn.onclick = function(){
-if(!playing){
+function playMusic(){
 frame.src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false";
 btn.innerHTML="🔊 TẮT NHẠC";
 btn.classList.remove("off");
 playing=true;
-}else{
+}
+
+function stopMusic(){
 frame.src="";
 btn.innerHTML="🎵 BẬT NHẠC";
 btn.classList.add("off");
 playing=false;
 }
+
+btn.onclick=function(){
+if(playing){
+stopMusic();
+}else{
+playMusic();
+}
+}
+
+window.onload=function(){
+setTimeout(()=>{
+playMusic();
+},1000);
 }
 </script>
 
