@@ -471,23 +471,40 @@ allow="autoplay"
 src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
 </iframe>
 
-<!-- NÚT NHẠC -->
+<!-- BOX NHẠC -->
+<div id="musicBox">
+
 <button id="rgbMusicBtn">
 <span id="musicIcon">🎵</span>
 <span id="musicText">ĐANG PHÁT</span>
 </button>
 
+<div id="volumeBox">
+<button class="volBtn" id="downVol">－</button>
+<span id="volNum">70%</span>
+<button class="volBtn" id="upVol">＋</button>
+</div>
+
+</div>
+
 <style>
-#rgbMusicBtn{
+#musicBox{
 position:fixed;
 right:18px;
 bottom:18px;
+z-index:999999;
+display:flex;
+flex-direction:column;
+gap:10px;
+align-items:end;
+}
+
+#rgbMusicBtn{
 width:185px;
-height:58px;
+height:56px;
 border:none;
 border-radius:50px;
 cursor:pointer;
-z-index:999999;
 font-size:15px;
 font-weight:700;
 color:#fff;
@@ -500,11 +517,10 @@ background-size:300% 300%;
 animation:rgbMove 4s linear infinite;
 box-shadow:0 0 15px rgba(255,255,255,.3);
 transition:.25s;
-backdrop-filter:blur(6px);
 }
 
 #rgbMusicBtn:hover{
-transform:scale(1.06);
+transform:scale(1.05);
 }
 
 #rgbMusicBtn.off{
@@ -512,6 +528,32 @@ background:#222;
 color:#aaa;
 animation:none;
 box-shadow:none;
+}
+
+#volumeBox{
+width:185px;
+height:46px;
+border-radius:40px;
+background:rgba(0,0,0,.55);
+backdrop-filter:blur(8px);
+display:flex;
+align-items:center;
+justify-content:center;
+gap:12px;
+color:#fff;
+font-weight:bold;
+}
+
+.volBtn{
+width:34px;
+height:34px;
+border:none;
+border-radius:50%;
+font-size:20px;
+cursor:pointer;
+font-weight:bold;
+color:#fff;
+background:linear-gradient(90deg,#00f0ff,#7b2fff,#ff00c8);
 }
 
 #musicIcon.spin{
@@ -538,15 +580,22 @@ const icon = document.getElementById("musicIcon");
 const iframe = document.getElementById("scMusic");
 const widget = SC.Widget(iframe);
 
-let playing = true;
+const upVol = document.getElementById("upVol");
+const downVol = document.getElementById("downVol");
+const volNum = document.getElementById("volNum");
 
-/* load trạng thái cũ */
-if(localStorage.getItem("musicState")==="off"){
-playing=false;
+let playing = true;
+let volume = localStorage.getItem("musicVolume") || 70;
+
+function updateVolume(){
+widget.setVolume(volume);
+volNum.innerHTML = volume + "%";
+localStorage.setItem("musicVolume", volume);
 }
 
 function playMusic(){
 widget.play();
+widget.setVolume(volume);
 btn.classList.remove("off");
 text.innerHTML="ĐANG PHÁT";
 icon.innerHTML="🎵";
@@ -573,15 +622,30 @@ playMusic();
 }
 }
 
-/* tự chạy khi vào web */
-window.onload=function(){
-setTimeout(()=>{
-if(playing){
-playMusic();
-}else{
-pauseMusic();
+upVol.onclick=function(){
+if(volume < 100){
+volume = parseInt(volume)+10;
+updateVolume();
 }
+}
+
+downVol.onclick=function(){
+if(volume > 0){
+volume = parseInt(volume)-10;
+updateVolume();
+}
+}
+
+window.onload=function(){
+if(localStorage.getItem("musicState")==="off"){
+playing=false;
+pauseMusic();
+}else{
+setTimeout(()=>{
+playMusic();
+updateVolume();
 },1200);
+}
 }
 </script>
 
