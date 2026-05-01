@@ -460,193 +460,38 @@ function copy(text) {
 <!-- SOUND CLOUD API -->
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<!-- PLAYER ẨN -->
+<!-- PLAYER ẨN PRO -->
+<div id="scWrap">
 <iframe
 id="scMusic"
-width="0"
-height="0"
 scrolling="no"
 frameborder="no"
 allow="autoplay"
 src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/trung-hoang-official/ximangphovol14&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false">
 </iframe>
-
-<!-- BOX NHẠC -->
-<div id="musicBox">
-
-<button id="rgbMusicBtn">
-<span id="musicIcon">🎵</span>
-<span id="musicText">ĐANG PHÁT</span>
-</button>
-
-<div id="volumeBox">
-<button class="volBtn" id="downVol">－</button>
-<span id="volNum">70%</span>
-<button class="volBtn" id="upVol">＋</button>
-</div>
-
 </div>
 
 <style>
-#musicBox{
+/* ẨN HOÀN TOÀN PLAYER */
+#scWrap{
 position:fixed;
-right:18px;
-bottom:18px;
-z-index:999999;
-display:flex;
-flex-direction:column;
-gap:10px;
-align-items:end;
+left:-99999px;
+top:-99999px;
+width:1px;
+height:1px;
+overflow:hidden;
+opacity:0;
+pointer-events:none;
+z-index:-9999;
 }
 
-#rgbMusicBtn{
-width:185px;
-height:56px;
-border:none;
-border-radius:50px;
-cursor:pointer;
-font-size:15px;
-font-weight:700;
-color:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:10px;
-background:linear-gradient(90deg,#00f0ff,#7b2fff,#ff00c8,#00ff88);
-background-size:300% 300%;
-animation:rgbMove 4s linear infinite;
-box-shadow:0 0 15px rgba(255,255,255,.3);
-transition:.25s;
-}
-
-#rgbMusicBtn:hover{
-transform:scale(1.05);
-}
-
-#rgbMusicBtn.off{
-background:#222;
-color:#aaa;
-animation:none;
-box-shadow:none;
-}
-
-#volumeBox{
-width:185px;
-height:46px;
-border-radius:40px;
-background:rgba(0,0,0,.55);
-backdrop-filter:blur(8px);
-display:flex;
-align-items:center;
-justify-content:center;
-gap:12px;
-color:#fff;
-font-weight:bold;
-}
-
-.volBtn{
-width:34px;
-height:34px;
-border:none;
-border-radius:50%;
-font-size:20px;
-cursor:pointer;
-font-weight:bold;
-color:#fff;
-background:linear-gradient(90deg,#00f0ff,#7b2fff,#ff00c8);
-}
-
-#musicIcon.spin{
-animation:spin 2s linear infinite;
-}
-
-@keyframes rgbMove{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-}
-
-@keyframes spin{
-from{transform:rotate(0deg);}
-to{transform:rotate(360deg);}
+#scMusic{
+width:1px;
+height:1px;
+border:0;
+opacity:0;
+pointer-events:none;
 }
 </style>
-
-<script>
-const btn = document.getElementById("rgbMusicBtn");
-const text = document.getElementById("musicText");
-const icon = document.getElementById("musicIcon");
-
-const iframe = document.getElementById("scMusic");
-const widget = SC.Widget(iframe);
-
-const upVol = document.getElementById("upVol");
-const downVol = document.getElementById("downVol");
-const volNum = document.getElementById("volNum");
-
-let playing = true;
-let volume = localStorage.getItem("musicVolume") || 70;
-
-function updateVolume(){
-widget.setVolume(volume);
-volNum.innerHTML = volume + "%";
-localStorage.setItem("musicVolume", volume);
-}
-
-function playMusic(){
-widget.play();
-widget.setVolume(volume);
-btn.classList.remove("off");
-text.innerHTML="ĐANG PHÁT";
-icon.innerHTML="🎵";
-icon.classList.add("spin");
-playing=true;
-localStorage.setItem("musicState","on");
-}
-
-function pauseMusic(){
-widget.pause();
-btn.classList.add("off");
-text.innerHTML="ĐÃ TẮT";
-icon.innerHTML="🔇";
-icon.classList.remove("spin");
-playing=false;
-localStorage.setItem("musicState","off");
-}
-
-btn.onclick=function(){
-if(playing){
-pauseMusic();
-}else{
-playMusic();
-}
-}
-
-upVol.onclick=function(){
-if(volume < 100){
-volume = parseInt(volume)+10;
-updateVolume();
-}
-}
-
-downVol.onclick=function(){
-if(volume > 0){
-volume = parseInt(volume)-10;
-updateVolume();
-}
-}
-
-window.onload=function(){
-if(localStorage.getItem("musicState")==="off"){
-playing=false;
-pauseMusic();
-}else{
-setTimeout(()=>{
-playMusic();
-updateVolume();
-},1200);
-}
-}
-</script>
 
 </body><savior-host style="all: unset; position: absolute; top: 0; z-index: 99999999999999; display: block !important; overflow: unset"></savior-host><en2vi-host class="corom-element" version="3" style="all: initial; position: absolute; top: 0; left: 0; right: 0; height: 0; margin: 0; text-align: left; z-index: 10000000000; pointer-events: none; border: none; display: block"></en2vi-host></html>
