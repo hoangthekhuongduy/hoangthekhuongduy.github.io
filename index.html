@@ -457,6 +457,72 @@ function copy(text) {
 <script src="assets/js/common.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
 <script src="assets/demo/plugins-demo.js"></script>
+<!-- NÚT NHẠC RGB GAMING -->
+<audio id="music" loop>
+<source src="https://store-na-phx-5.gofile.io/download/web/456409fd-1de8-4b6e-a388-3559b55e0c9d/sao%20th%E1%BA%A5y%20%C4%91%C3%B4i%20mi%20em%20bu%E1%BB%93n....mp3" type="audio/mpeg">
+</audio>
 
+<button id="rgbMusicBtn">🎵 MUSIC ON</button>
+
+<style>
+#rgbMusicBtn{
+position:fixed;
+right:20px;
+bottom:20px;
+width:180px;
+height:58px;
+border:none;
+border-radius:40px;
+font-size:17px;
+font-weight:bold;
+color:#fff;
+cursor:pointer;
+z-index:999999;
+background:linear-gradient(90deg,#00f0ff,#7b2fff,#ff00c8,#00ff88);
+background-size:300% 300%;
+box-shadow:0 0 10px #00f0ff,0 0 20px #7b2fff,0 0 30px #ff00c8;
+animation:rgbMove 4s linear infinite;
+transition:0.3s;
+}
+
+#rgbMusicBtn:hover{
+transform:scale(1.05);
+}
+
+#rgbMusicBtn.off{
+background:linear-gradient(90deg,#444,#222,#444);
+box-shadow:none;
+color:#aaa;
+animation:none;
+}
+
+@keyframes rgbMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+</style>
+
+<script>
+const music=document.getElementById("music");
+const btn=document.getElementById("rgbMusicBtn");
+
+window.addEventListener("load",function(){
+music.volume=0.7;
+music.play().catch(()=>{});
+});
+
+btn.onclick=function(){
+if(music.paused){
+music.play();
+btn.innerHTML="🎵 MUSIC ON";
+btn.classList.remove("off");
+}else{
+music.pause();
+btn.innerHTML="🔇 MUSIC OFF";
+btn.classList.add("off");
+}
+}
+</script>
 
 </body><savior-host style="all: unset; position: absolute; top: 0; z-index: 99999999999999; display: block !important; overflow: unset"></savior-host><en2vi-host class="corom-element" version="3" style="all: initial; position: absolute; top: 0; left: 0; right: 0; height: 0; margin: 0; text-align: left; z-index: 10000000000; pointer-events: none; border: none; display: block"></en2vi-host></html>
