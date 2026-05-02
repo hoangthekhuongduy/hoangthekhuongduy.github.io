@@ -459,127 +459,75 @@ function copy(text) {
 <script src="assets/demo/plugins-demo.js"></script>
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<div id="app">
-
-<div id="bgBlur"></div>
-
-<div id="player">
-
-<div id="cover">🎵</div>
-
-<div id="info">
-<div id="songName">Loading...</div>
-<div id="time">
-<span id="cur">0:00</span>
-<div id="bar">
-<div id="fill"></div>
-</div>
-<span id="dur">0:00</span>
-</div>
-</div>
-
-<button id="playBtn">▶</button>
-
-<div id="controls">
-<button id="prev">⏮</button>
-<button id="next">⏭</button>
-<button id="rand">🔀</button>
-</div>
-
-</div>
-
-</div>
-
+<!-- PLAYER ẨN -->
 <iframe id="scMusic" style="display:none;"></iframe>
 
+<!-- MINI PLAYER -->
+<div id="miniPlayer">
+
+<div id="title">🎵 Loading...</div>
+
+<div id="btnRow">
+<button id="prev">⏮</button>
+<button id="play">▶</button>
+<button id="next">⏭</button>
+</div>
+
+</div>
+
 <style>
-body{margin:0;background:#000;font-family:Arial;color:#fff;overflow:hidden}
-
-#bgBlur{
-position:fixed;inset:0;
+body{
+margin:0;
+font-family:Arial;
 background:#111;
-filter:blur(40px);
-transform:scale(1.2);
-opacity:.6;
+color:#fff;
+overflow-y:auto; /* FIX KHÔNG CHẶN LƯỚT */
 }
 
-#player{
+#miniPlayer{
 position:fixed;
-bottom:20px;
-left:50%;
-transform:translateX(-50%);
-width:320px;
-padding:20px;
-border-radius:25px;
+right:15px;
+bottom:15px;
+width:180px;
+padding:12px;
+border-radius:18px;
 background:rgba(0,0,0,.6);
-backdrop-filter:blur(15px);
-text-align:center;
+backdrop-filter:blur(10px);
+z-index:9999;
 }
 
-#cover{
-width:90px;height:90px;
-margin:auto;
-border-radius:20px;
-background:linear-gradient(45deg,#00f,#f0f,#0ff);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:30px;
-animation:spin 6s linear infinite;
-}
-
-#songName{margin-top:10px;font-weight:700}
-
-#time{
-display:flex;
-align-items:center;
-gap:8px;
+#title{
 font-size:12px;
-margin-top:10px;
+text-align:center;
+margin-bottom:8px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
-#bar{
-flex:1;height:4px;background:#333;border-radius:10px;position:relative;
-cursor:pointer;
-}
-
-#fill{
-height:100%;width:0%;
-background:#1db954;
-border-radius:10px;
-}
-
-#playBtn{
-margin-top:15px;
-width:60px;height:60px;
-border-radius:50%;
-border:none;
-font-size:20px;
-background:#1db954;
-color:#000;
-font-weight:bold;
-}
-
-#controls{
-margin-top:10px;
+#btnRow{
 display:flex;
-justify-content:center;
-gap:20px;
+justify-content:space-between;
 }
 
 button{
 border:none;
-background:none;
-color:#fff;
-font-size:18px;
+background:#1db954;
+color:#000;
+border-radius:50%;
+width:34px;
+height:34px;
+font-size:14px;
 cursor:pointer;
 }
 
-@keyframes spin{to{transform:rotate(360deg)}}
+button:active{
+transform:scale(.95);
+}
 </style>
 
 <script>
-const songs = [
+const songs=[
 {
 name:"Xi Măng Phố Vol14",
 url:"https://soundcloud.com/trung-hoang-official/ximangphovol14"
@@ -594,48 +542,40 @@ url:"https://soundcloud.com/ditmechungmaymuongi1/khi-phai-quen-di-ft-sau-loi-tu-
 }
 ];
 
-let i=0,widget,playing=false,ready=false;
+let i=0;
+let widget;
+let playing=false;
+
 const iframe=document.getElementById("scMusic");
+const title=document.getElementById("title");
 
 function loadSong(x){
 i=x;
+
 iframe.src="https://w.soundcloud.com/player/?url="+encodeURIComponent(songs[i].url)+"&auto_play=false&visual=false";
 
-document.getElementById("songName").innerText=songs[i].name;
+title.innerText=songs[i].name;
 
 setTimeout(()=>{
 widget=SC.Widget(iframe);
-
-widget.bind(SC.Widget.Events.READY,()=>{
-ready=true;
-widget.setVolume(80);
-});
-
-widget.bind(SC.Widget.Events.PLAY_PROGRESS,e=>{
-let p=e.relativePosition*100;
-document.getElementById("fill").style.width=p+"%";
-
-let t=Math.floor(e.currentPosition/1000);
-document.getElementById("cur").innerText=Math.floor(t/60)+":"+(t%60).toString().padStart(2,"0");
-});
-
 },800);
 }
 
 function play(){
-if(!ready) return;
-playing=true;
+if(!widget) return;
 widget.play();
-document.getElementById("playBtn").innerText="⏸";
+playing=true;
+document.getElementById("play").innerText="⏸";
 }
 
 function pause(){
-playing=false;
+if(!widget) return;
 widget.pause();
-document.getElementById("playBtn").innerText="▶";
+playing=false;
+document.getElementById("play").innerText="▶";
 }
 
-/* mobile fix autoplay */
+/* FIX MOBILE TAP */
 document.addEventListener("click",()=>{
 if(!widget){
 loadSong(i);
@@ -644,21 +584,20 @@ return;
 play();
 },{once:true});
 
-document.getElementById("playBtn").onclick=()=>{
+document.getElementById("play").onclick=(e)=>{
+e.stopPropagation();
 if(playing) pause();
 else play();
 };
 
-document.getElementById("next").onclick=()=>loadSong((i+1)%songs.length);
-document.getElementById("prev").onclick=()=>loadSong((i-1+songs.length)%songs.length);
-document.getElementById("rand").onclick=()=>loadSong(Math.floor(Math.random()*songs.length));
+document.getElementById("next").onclick=()=>{
+loadSong((i+1)%songs.length);
+};
 
-document.getElementById("bar").onclick=(e)=>{
-let percent=e.offsetX/e.target.clientWidth;
-widget.seekTo(percent*1000*200);
+document.getElementById("prev").onclick=()=>{
+loadSong((i-1+songs.length)%songs.length);
 };
 
 window.onload=()=>loadSong(i);
 </script>
-
 </body><savior-host style="all: unset; position: absolute; top: 0; z-index: 99999999999999; display: block !important; overflow: unset"></savior-host><en2vi-host class="corom-element" version="3" style="all: initial; position: absolute; top: 0; left: 0; right: 0; height: 0; margin: 0; text-align: left; z-index: 10000000000; pointer-events: none; border: none; display: block"></en2vi-host></html>
