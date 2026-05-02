@@ -459,15 +459,20 @@ function copy(text) {
 <script src="assets/demo/plugins-demo.js"></script>
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<script src="https://w.soundcloud.com/player/api.js"></script>
-
 <iframe id="scMusic" style="display:none;"></iframe>
 
 <div id="miniPlayer">
 
 <div id="title">🎵 Loading...</div>
 
-<div id="led"></div>
+<div id="ledBar">
+<div class="led"></div>
+<div class="led"></div>
+<div class="led"></div>
+<div class="led"></div>
+<div class="led"></div>
+<div class="led"></div>
+</div>
 
 <div id="btnRow">
 <button id="prev">⏮</button>
@@ -483,19 +488,19 @@ margin:0;
 font-family:Arial;
 background:#111;
 color:#fff;
-overflow-y:auto; /* FIX LƯỚT WEB */
+overflow-y:auto;
 }
 
-/* MINI PLAYER */
+/* PLAYER */
 #miniPlayer{
 position:fixed;
 right:15px;
 bottom:15px;
-width:190px;
+width:200px;
 padding:12px;
 border-radius:18px;
 background:rgba(0,0,0,.6);
-backdrop-filter:blur(10px);
+backdrop-filter:blur(12px);
 z-index:9999;
 text-align:center;
 }
@@ -503,26 +508,41 @@ text-align:center;
 /* TITLE */
 #title{
 font-size:12px;
-margin-bottom:6px;
+margin-bottom:8px;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
 }
 
-/* LED RGB */
-#led{
-width:100%;
-height:4px;
-border-radius:10px;
-margin-bottom:8px;
-background:linear-gradient(90deg,#ff0000,#ff9900,#00ff00,#00ffff,#ff00ff);
-background-size:300% 300%;
-animation:rgb 2s linear infinite;
+/* LED VISUALIZER */
+#ledBar{
+display:flex;
+justify-content:center;
+gap:3px;
+height:20px;
+margin-bottom:10px;
+align-items:flex-end;
 }
 
-@keyframes rgb{
-0%{background-position:0% 50%}
-100%{background-position:100% 50%}
+.led{
+width:6px;
+height:5px;
+background:linear-gradient(180deg,#00f0ff,#ff00ff);
+border-radius:4px;
+animation:idle 1s infinite ease-in-out;
+}
+
+/* fake beat animation */
+@keyframes beat{
+0%{height:4px;opacity:.4}
+50%{height:18px;opacity:1}
+100%{height:6px;opacity:.6}
+}
+
+@keyframes idle{
+0%{transform:scaleY(.5)}
+50%{transform:scaleY(1.2)}
+100%{transform:scaleY(.7)}
 }
 
 /* BUTTONS */
@@ -533,8 +553,8 @@ justify-content:space-between;
 
 button{
 border:none;
-width:36px;
-height:36px;
+width:38px;
+height:38px;
 border-radius:50%;
 background:#1db954;
 color:#000;
@@ -563,19 +583,32 @@ url:"https://soundcloud.com/ditmechungmaymuongi1/khi-phai-quen-di-ft-sau-loi-tu-
 }
 ];
 
-let i=0;
-let widget;
-let playing=false;
-let ready=false;
-
+let i=0,widget,playing=false,ready=false;
 const iframe=document.getElementById("scMusic");
 const title=document.getElementById("title");
 const playBtn=document.getElementById("play");
+const leds=document.querySelectorAll(".led");
 
-/* LOAD SONG (FIX CHUYỂN BÀI KHÔNG CẦN TẮT) */
+/* LED FAKE AUDIO REACT */
+function startVisual(){
+setInterval(()=>{
+if(!playing) return;
+
+leds.forEach((l)=>{
+let h = Math.random()*18 + 4;
+let delay = Math.random()*200;
+
+setTimeout(()=>{
+l.style.height=h+"px";
+l.style.opacity=Math.random()+0.4;
+},delay);
+});
+},120);
+}
+
+/* LOAD SONG FIXED */
 function loadSong(x){
 i=x;
-
 ready=false;
 playing=false;
 playBtn.innerText="▶";
@@ -587,9 +620,8 @@ encodeURIComponent(songs[i].url)+
 
 title.innerText=songs[i].name;
 
-/* IMPORTANT FIX */
 setTimeout(()=>{
-widget = SC.Widget(iframe);
+widget=SC.Widget(iframe);
 
 widget.bind(SC.Widget.Events.READY,()=>{
 ready=true;
@@ -606,9 +638,7 @@ if(!widget) return;
 playing=true;
 playBtn.innerText="⏸";
 
-if(ready){
-widget.play();
-}
+if(ready) widget.play();
 }
 
 /* PAUSE */
@@ -621,7 +651,7 @@ playBtn.innerText="▶";
 widget.pause();
 }
 
-/* FIRST TAP FIX MOBILE */
+/* MOBILE TAP FIX */
 document.addEventListener("click",()=>{
 if(!widget){
 loadSong(i);
@@ -633,8 +663,7 @@ play();
 /* BUTTONS */
 playBtn.onclick=(e)=>{
 e.stopPropagation();
-if(playing) pause();
-else play();
+playing ? pause() : play();
 };
 
 document.getElementById("next").onclick=()=>{
@@ -645,6 +674,9 @@ document.getElementById("prev").onclick=()=>{
 loadSong((i-1+songs.length)%songs.length);
 };
 
-window.onload=()=>loadSong(i);
+window.onload=()=>{
+loadSong(i);
+startVisual();
+};
 </script>
 </body><savior-host style="all: unset; position: absolute; top: 0; z-index: 99999999999999; display: block !important; overflow: unset"></savior-host><en2vi-host class="corom-element" version="3" style="all: initial; position: absolute; top: 0; left: 0; right: 0; height: 0; margin: 0; text-align: left; z-index: 10000000000; pointer-events: none; border: none; display: block"></en2vi-host></html>
