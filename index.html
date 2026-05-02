@@ -459,13 +459,15 @@ function copy(text) {
 <script src="assets/demo/plugins-demo.js"></script>
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<!-- PLAYER ẨN -->
+<script src="https://w.soundcloud.com/player/api.js"></script>
+
 <iframe id="scMusic" style="display:none;"></iframe>
 
-<!-- MINI PLAYER -->
 <div id="miniPlayer">
 
 <div id="title">🎵 Loading...</div>
+
+<div id="led"></div>
 
 <div id="btnRow">
 <button id="prev">⏮</button>
@@ -481,30 +483,49 @@ margin:0;
 font-family:Arial;
 background:#111;
 color:#fff;
-overflow-y:auto; /* FIX KHÔNG CHẶN LƯỚT */
+overflow-y:auto; /* FIX LƯỚT WEB */
 }
 
+/* MINI PLAYER */
 #miniPlayer{
 position:fixed;
 right:15px;
 bottom:15px;
-width:180px;
+width:190px;
 padding:12px;
 border-radius:18px;
 background:rgba(0,0,0,.6);
 backdrop-filter:blur(10px);
 z-index:9999;
+text-align:center;
 }
 
+/* TITLE */
 #title{
 font-size:12px;
-text-align:center;
-margin-bottom:8px;
+margin-bottom:6px;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
 }
 
+/* LED RGB */
+#led{
+width:100%;
+height:4px;
+border-radius:10px;
+margin-bottom:8px;
+background:linear-gradient(90deg,#ff0000,#ff9900,#00ff00,#00ffff,#ff00ff);
+background-size:300% 300%;
+animation:rgb 2s linear infinite;
+}
+
+@keyframes rgb{
+0%{background-position:0% 50%}
+100%{background-position:100% 50%}
+}
+
+/* BUTTONS */
 #btnRow{
 display:flex;
 justify-content:space-between;
@@ -512,17 +533,17 @@ justify-content:space-between;
 
 button{
 border:none;
+width:36px;
+height:36px;
+border-radius:50%;
 background:#1db954;
 color:#000;
-border-radius:50%;
-width:34px;
-height:34px;
 font-size:14px;
 cursor:pointer;
 }
 
 button:active{
-transform:scale(.95);
+transform:scale(.9);
 }
 </style>
 
@@ -545,37 +566,62 @@ url:"https://soundcloud.com/ditmechungmaymuongi1/khi-phai-quen-di-ft-sau-loi-tu-
 let i=0;
 let widget;
 let playing=false;
+let ready=false;
 
 const iframe=document.getElementById("scMusic");
 const title=document.getElementById("title");
+const playBtn=document.getElementById("play");
 
+/* LOAD SONG (FIX CHUYỂN BÀI KHÔNG CẦN TẮT) */
 function loadSong(x){
 i=x;
 
-iframe.src="https://w.soundcloud.com/player/?url="+encodeURIComponent(songs[i].url)+"&auto_play=false&visual=false";
+ready=false;
+playing=false;
+playBtn.innerText="▶";
+
+iframe.src=
+"https://w.soundcloud.com/player/?url="+
+encodeURIComponent(songs[i].url)+
+"&auto_play=false&visual=false";
 
 title.innerText=songs[i].name;
 
+/* IMPORTANT FIX */
 setTimeout(()=>{
-widget=SC.Widget(iframe);
-},800);
+widget = SC.Widget(iframe);
+
+widget.bind(SC.Widget.Events.READY,()=>{
+ready=true;
+widget.setVolume(80);
+if(playing) widget.play();
+});
+},900);
 }
 
+/* PLAY */
 function play(){
 if(!widget) return;
-widget.play();
+
 playing=true;
-document.getElementById("play").innerText="⏸";
+playBtn.innerText="⏸";
+
+if(ready){
+widget.play();
+}
 }
 
+/* PAUSE */
 function pause(){
 if(!widget) return;
-widget.pause();
+
 playing=false;
-document.getElementById("play").innerText="▶";
+playBtn.innerText="▶";
+
+widget.pause();
 }
 
-/* FIX MOBILE TAP */
+/* FIRST TAP FIX MOBILE */
 document.addEventListener("click",()=>{
 if(!widget){
 loadSong(i);
@@ -584,7 +630,8 @@ return;
 play();
 },{once:true});
 
-document.getElementById("play").onclick=(e)=>{
+/* BUTTONS */
+playBtn.onclick=(e)=>{
 e.stopPropagation();
 if(playing) pause();
 else play();
