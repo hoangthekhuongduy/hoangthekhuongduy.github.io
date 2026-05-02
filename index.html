@@ -459,7 +459,7 @@ function copy(text) {
 <script src="assets/demo/plugins-demo.js"></script>
 <script src="https://w.soundcloud.com/player/api.js"></script>
 
-<!-- BACKGROUND BLUR -->
+<!-- BACKGROUND -->
 <div id="bgBlur"></div>
 
 <!-- PLAYER ẨN -->
@@ -483,11 +483,16 @@ function copy(text) {
 <div class="led"></div>
 </div>
 
+<!-- CONTROL -->
 <div id="btnRow">
 <button id="prev">⏮</button>
+<button id="down">－</button>
 <button id="play">▶</button>
+<button id="up">＋</button>
 <button id="next">⏭</button>
 </div>
+
+<div id="volText">🔊 80%</div>
 
 </div>
 
@@ -496,11 +501,10 @@ body{
 margin:0;
 font-family:Arial;
 background:#000;
-color:#fff;
-overflow-y:auto; /* FIX KHÔNG CHẶN LƯỚT */
+overflow-y:auto;
 }
 
-/* BLUR BACKGROUND */
+/* BLUR BG */
 #bgBlur{
 position:fixed;
 inset:0;
@@ -517,13 +521,14 @@ transition:1s;
 position:fixed;
 right:15px;
 bottom:15px;
-width:200px;
+width:210px;
 padding:12px;
 border-radius:18px;
 background:rgba(0,0,0,.6);
 backdrop-filter:blur(12px);
 z-index:9999;
 text-align:center;
+color:#fff;
 }
 
 /* COVER */
@@ -543,7 +548,6 @@ height:100%;
 object-fit:cover;
 }
 
-/* XOAY */
 #coverImg.playing{
 animation:spin 4s linear infinite;
 }
@@ -589,12 +593,14 @@ animation:beat 1s infinite ease-in-out;
 #btnRow{
 display:flex;
 justify-content:space-between;
+gap:6px;
+margin-bottom:8px;
 }
 
 button{
 border:none;
-width:38px;
-height:38px;
+width:34px;
+height:34px;
 border-radius:50%;
 background:#1db954;
 color:#000;
@@ -605,10 +611,15 @@ cursor:pointer;
 button:active{
 transform:scale(.9);
 }
+
+#volText{
+font-size:11px;
+opacity:.9;
+}
 </style>
 
 <script>
-const songs=[
+const songs = [
 {
 name:"Xi Măng Phố Vol14",
 url:"https://soundcloud.com/trung-hoang-official/ximangphovol14",
@@ -623,102 +634,113 @@ img:"https://i.imgur.com/tGOU3SO.jpeg"
 name:"Khi Phải Quên Đi",
 url:"https://soundcloud.com/ditmechungmaymuongi1/khi-phai-quen-di-ft-sau-loi-tu-khuoc-by-hoang-an",
 img:"https://i.imgur.com/STP7hAM.jpeg"
-},
-{
-name:"Chill Mix",
-url:"https://soundcloud.com/anh-phan-821018039/nhac-chill",
-img:"https://i.imgur.com/NMXRet8.jpeg"
 }
 ];
 
-let i=0;
+let i = 0;
 let widget;
-let playing=false;
-let ready=false;
+let ready = false;
+let playing = false;
+let volume = 80;
 
-const iframe=document.getElementById("scMusic");
-const title=document.getElementById("title");
-const playBtn=document.getElementById("play");
-const cover=document.getElementById("coverImg");
+const iframe = document.getElementById("scMusic");
+const title = document.getElementById("title");
+const playBtn = document.getElementById("play");
+const cover = document.getElementById("coverImg");
+const volText = document.getElementById("volText");
 
-/* LOAD SONG */
 function loadSong(x){
-i=x;
+i = x;
+ready = false;
+playing = false;
+playBtn.innerText = "▶";
+cover.classList.remove("playing");
 
-ready=false;
-playing=false;
-playBtn.innerText="▶";
-
-iframe.src=
-"https://w.soundcloud.com/player/?url="+
-encodeURIComponent(songs[i].url)+
+iframe.src =
+"https://w.soundcloud.com/player/?url=" +
+encodeURIComponent(songs[i].url) +
 "&auto_play=false&visual=false";
 
-title.innerText=songs[i].name;
+title.innerText = songs[i].name;
+cover.src = songs[i].img;
 
-/* UPDATE COVER + BLUR */
-cover.src=songs[i].img;
-document.getElementById("bgBlur").style.backgroundImage=
+document.getElementById("bgBlur").style.backgroundImage =
 "url("+songs[i].img+")";
 
 setTimeout(()=>{
-widget=SC.Widget(iframe);
+widget = SC.Widget(iframe);
 
-widget.bind(SC.Widget.Events.READY,()=>{
-ready=true;
-widget.setVolume(80);
-if(playing) widget.play();
+widget.bind(SC.Widget.Events.READY, ()=>{
+ready = true;
+widget.setVolume(volume);
+volText.innerText = "🔊 " + volume + "%";
 });
 
 },900);
 }
 
-/* PLAY */
-function play(){
-if(!widget) return;
+function playMusic(){
+if(!widget || !ready) return;
 
-playing=true;
-playBtn.innerText="⏸";
+widget.play();
+playing = true;
+playBtn.innerText = "⏸";
 cover.classList.add("playing");
-
-if(ready) widget.play();
 }
 
-/* PAUSE */
-function pause(){
+function pauseMusic(){
 if(!widget) return;
-
-playing=false;
-playBtn.innerText="▶";
-cover.classList.remove("playing");
 
 widget.pause();
+playing = false;
+playBtn.innerText = "▶";
+cover.classList.remove("playing");
 }
 
-/* MOBILE TAP FIX */
-document.addEventListener("click",()=>{
-if(!widget){
+/* FIRST TAP MOBILE */
+document.addEventListener("click", function firstTap(){
+if(!ready){
 loadSong(i);
-return;
+setTimeout(playMusic,1200);
 }
-play();
 },{once:true});
 
-/* BUTTONS */
-playBtn.onclick=(e)=>{
+/* PLAY BUTTON */
+playBtn.onclick = (e)=>{
 e.stopPropagation();
-playing ? pause() : play();
+playing ? pauseMusic() : playMusic();
 };
 
-document.getElementById("next").onclick=()=>{
+/* NEXT PREV */
+document.getElementById("next").onclick = ()=>{
 loadSong((i+1)%songs.length);
+setTimeout(playMusic,1200);
 };
 
-document.getElementById("prev").onclick=()=>{
+document.getElementById("prev").onclick = ()=>{
 loadSong((i-1+songs.length)%songs.length);
+setTimeout(playMusic,1200);
 };
 
-window.onload=()=>{
+/* VOLUME */
+document.getElementById("up").onclick = ()=>{
+if(volume < 100){
+volume += 10;
+if(widget) widget.setVolume(volume);
+volText.innerText = "🔊 " + volume + "%";
+}
+};
+
+document.getElementById("down").onclick = ()=>{
+if(volume > 0){
+volume -= 10;
+if(widget) widget.setVolume(volume);
+volText.innerText = "🔊 " + volume + "%";
+}
+};
+
+/* START */
+window.onload = ()=>{
 loadSong(i);
 };
 </script>
